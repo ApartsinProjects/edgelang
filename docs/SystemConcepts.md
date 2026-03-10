@@ -215,7 +215,7 @@ The system remembers prior success, repeated errors, and resolved items to avoid
 
 The learner can request extra examples and short usage notes to support durable understanding.
 
-### 22. Multi-provider AI execution
+### 10. Multi-provider AI execution
 
 The extension uses ModelMesh TypeScript library to route pedagogical requests across multiple AI providers directly from the browser, with automatic failover and quota management.
 
@@ -228,15 +228,15 @@ When all configured providers have exhausted their quotas:
 
 This prevents frustration from repeated failed API calls and manages expectations during quota limits.
 
-### 10. Cost- and reliability-aware inference
+### 11. Cost- and reliability-aware inference
 
 The product can assign different subtasks to different models depending on speed, cost, availability, and output quality requirements.
 
-### 11. Proficiency calibration wizard
+### 12. Proficiency calibration wizard
 
 Before or alongside regular browsing, the system offers a structured assessment flow that quickly narrows down the learner's competence boundary. The wizard presents a sequence of 10 multiple-choice questions drawn from the target language, mixing passive (recognition) and active (recall) formats. Each question targets vocabulary and phrases at different difficulty bands. The LLM generates questions on-the-fly from common target language vocabulary, adapting based on learner responses to efficiently narrow down the competence boundary. For returning users with prior answer history, the LLM uses that data to refine the estimate. After completing a round of 10, the system displays a provisional level estimate and asks the learner whether they want to continue for greater precision. This iterative refinement continues until the learner is satisfied or the system reaches high confidence. The wizard can also resume from a partial profile if the learner has prior history, allowing for quick updates rather than starting over.
 
-### 12. Configurable options page
+### 13. Configurable options page
 
 The extension provides an options page where users configure:
 
@@ -245,7 +245,8 @@ The extension provides an options page where users configure:
 - **AI providers**: API keys for OpenAI, Anthropic, Gemini, Groq, or other ModelMesh-supported providers
 - **Model selection**: which models to use for different tasks (e.g., faster models for classification, smarter models for explanation generation)
 - **Visual cues**: preferred visual cue style (see capability #13)
-- **Intensity slider**: how many items receive visual cues per page
+- **Question intensity**: percentage of words to show visual cues for, relative to page length (e.g., 5% of words per 500 words)
+- **Recall intensity**: probability that already-correctly-answered items reappear for practice (0-100%)
 - **Multiple choice options**: number of choices per question (default 5, range 3-6)
 - **Gamification toggles**: enable/disable positive feedback, negative feedback separately
 - **Auto-start preferences**: whether to launch calibration on first use
@@ -289,6 +290,8 @@ All user data is stored locally in the browser using chrome.storage. This includ
 
 No data is sent to external servers. Users can export or clear their data at any time through the options page.
 
+API keys are stored securely in chrome.storage and are never transmitted to any external servers except directly to the AI providers when making LLM requests.
+
 ### 16. Offline mode
 
 The extension requires an internet connection to function, as all pedagogical intelligence relies on LLM API calls. When offline:
@@ -300,7 +303,7 @@ The extension requires an internet connection to function, as all pedagogical in
 
 This ensures users are not confused by non-functional cues and prevents frustration from failed API calls.
 
-### 23. API configuration handling
+### 18. API configuration handling
 
 When API keys are not configured:
 
@@ -311,19 +314,19 @@ When API keys are not configured:
 
 This prevents user confusion about why the extension isn't working and guides them to configuration.
 
-### 17. Toolbar icon and popup
+### 19. Toolbar icon and popup
 
 The extension appears as an icon in the Chrome toolbar with a popup that provides:
 
 - **Status indicator**: shows whether extension is active, offline, or needs configuration
-- **Quick toggle**: enable/disable extension for current page
+- **Global toggle**: enable/disable extension globally for all sites
 - **Mode switch**: toggle between passive and active mode
 - **Language detection**: shows detected page language, with manual override option
 - **Quick actions**: fast access to add/remove current site from blacklist/whitelist
 
 The toolbar icon also shows visual cues when API keys are not configured (e.g., grayed out or warning icon).
 
-### 18. Site blacklist and whitelist
+### 20. Site blacklist and whitelist
 
 Users can control which sites the extension operates on:
 
@@ -334,7 +337,7 @@ Users can control which sites the extension operates on:
 
 This gives users granular control over where learning opportunities appear.
 
-### 19. Auto-detect page language with manual override
+### 21. Auto-detect page language with manual override
 
 The extension automatically detects the language of each page:
 
@@ -344,7 +347,7 @@ The extension automatically detects the language of each page:
 
 This enables seamless switching between passive mode (target language pages) and active mode (native language pages) without user configuration.
 
-### 20. First-run onboarding and calibration wizard
+### 22. First-run onboarding and calibration wizard
 
 On first installation:
 
@@ -355,7 +358,7 @@ On first installation:
 
 Users can re-run calibration anytime from the options page or toolbar popup.
 
-### 21. Non-blocking, fast-loading design
+### 23. Non-blocking, fast-loading design
 
 The extension is designed to never interfere with normal browser usage:
 
@@ -364,6 +367,7 @@ The extension is designed to never interfere with normal browser usage:
 - **Lightweight footprint**: minimal JavaScript bundle, lazy-loaded features
 - **Efficient API calls**: requests are batched where possible, with intelligent caching
 - **Graceful degradation**: if LLM is slow, page remains readable without cues until response arrives
+- **Page analysis**: every page visit triggers a fresh analysis to identify learnable items
 
 This ensures the extension enhances browsing rather than hindering it.
 
@@ -425,6 +429,10 @@ As a learner, I want the system to avoid showing visual cues to items I clearly 
 
 As a learner, I want the system to avoid testing me on items that are too difficult for my current level, so that I do not become frustrated.
 
+### US-04 — Handle pages with no edge items
+
+As a learner, when I visit a page where no items are at my learning edge, I want to see a subtle message or indicator that explains why no visual cues are shown, so that I understand the extension is working but the content is not suitable for my level.
+
 ### US-04 — Support phrase-level understanding
 
 As a learner, I want the extension to show visual cues to multi-word expressions and typical word sequences, not just isolated words, so that I can learn natural language patterns.
@@ -439,7 +447,7 @@ As a learner, I want the wrong answer choices to be realistic and close in meani
 
 ### US-07 — Resolve known items
 
-As a learner, I want correctly answered items to be marked as resolved after answering correctly once and hidden forever, so that I can see progress and never be interrupted for already mastered content.
+As a learner, I want correctly answered items to be marked as resolved after answering correctly once and hidden forever, so that I can see progress and never be interrupted for already mastered content. I also want the ability to manually reset any resolved item back to active if I want to review it again.
 
 ### US-08 — Receive explanation after mistakes
 
@@ -512,6 +520,10 @@ As a new learner, I want to answer a structured set of questions upfront so that
 ### US-22 — Refine an existing profile
 
 As a returning learner, I want the option to run a quick calibration that builds on my existing profile rather than starting over, so that I can update my level without redundant questions.
+
+### US-22b — Re-calibrate my level
+
+As a learner who wants to reassess my competence, I want to re-run the calibration wizard from scratch to get a fresh level estimate, so that I can reset my profile if I believe it has drifted.
 
 ### US-23 — Complete a round of 10 questions
 
@@ -619,47 +631,51 @@ As a user, I want to enter API keys for one or more AI providers (OpenAI, Anthro
 
 As a user, I want to choose which models to use for different operations (fast models for classification, smart models for explanations), so that I can balance speed, cost, and quality.
 
-### US-47 — Control visual cue intensity
+### US-47 — Control question intensity
 
-As a learner, I want to adjust how many visual cues are shown on each page via a slider, so that the learning density matches my available time and focus.
+As a learner, I want to configure what percentage of words on a page show visual cues (e.g., 5% per 500 words), so that the learning density matches my available time and focus.
 
-### US-48 — Export or clear my data
+### US-48 — Control recall intensity
+
+As a learner, I want to configure the probability that already-correctly-answered items reappear for practice (0-100%), so that I can balance review frequency against seeing new content.
+
+### US-49 — Export or clear my data
 
 As a privacy-conscious user, I want to export my learning data or clear it entirely, so that I have control over my personal information.
 
-### US-49 — Use toolbar popup for quick actions
+### US-50 — Use toolbar popup for quick actions
 
 As a user, I want to click the extension icon in the toolbar to see status, toggle on/off, switch modes, and quickly manage the current site, so that I don't need to open the full options page for common actions.
 
-### US-50 — See toolbar indicator when not configured
+### US-51 — See toolbar indicator when not configured
 
 As a new user, I want the toolbar icon to show a clear visual indicator when API keys are missing, so that I know the extension needs configuration before use.
 
-### US-51 — Blacklist sites I don't want
+### US-52 — Blacklist sites I don't want
 
 As a user, I want to blacklist specific websites so that the extension ignores them, so that learning opportunities only appear where I want them.
 
-### US-52 — Whitelist only specific sites
+### US-53 — Whitelist only specific sites
 
 As a user, I want to switch to whitelist mode so the extension only works on sites I explicitly allow, giving me precise control over where learning happens.
 
-### US-53 — Quickly add/remove site from list
+### US-54 — Quickly add/remove site from list
 
 As a user, I want to add or remove the current site from my blacklist or whitelist with one click from the toolbar popup, so that I can manage site lists without opening options.
 
-### US-54 — Run calibration wizard on first use
+### US-55 — Run calibration wizard on first use
 
 As a new user, I want the calibration wizard to launch automatically after configuration, so that the extension starts with a personalized level estimate.
 
-### US-55 — Get positive feedback on correct answers
+### US-56 — Get positive feedback on correct answers
 
 As a learner, I want to receive encouraging feedback (points, streaks, encouraging messages) when I answer correctly, so that I feel motivated and see my progress.
 
-### US-56 — Get constructive feedback on incorrect answers
+### US-57 — Get constructive feedback on incorrect answers
 
 As a learner, I want to receive constructive feedback when I answer incorrectly (e.g., encouraging messages, explanation), so that I stay motivated to keep trying.
 
-### US-57 — Disable gamification features
+### US-58 — Disable gamification features
 
 As a user, I want to disable positive feedback, negative feedback, or both, so that the learning experience matches my preferences.
 
@@ -667,27 +683,27 @@ As a user, I want to disable positive feedback, negative feedback, or both, so t
 
 ## AI and System User Stories
 
-### US-58 — Route across providers transparently
+### US-59 — Route across providers transparently
 
 As a product developer, I want AI requests to be routed through ModelMesh, so that the extension is not tightly coupled to a single provider.
 
-### US-59 — Fall back automatically
+### US-60 — Fall back automatically
 
 As a user, I want the extension to keep working even if one AI provider is slow or unavailable, so that the experience remains smooth.
 
-### US-60 — Optimize cost by task type
+### US-61 — Optimize cost by task type
 
 As a product owner, I want different pedagogical subtasks to be sent to different models depending on complexity, so that quality is preserved while controlling cost.
 
-### US-61 — Compare model quality
+### US-62 — Compare model quality
 
 As a product developer, I want to compare outputs from different providers for tasks like distractor generation and explanation quality, so that the system can improve over time.
 
-### US-62 — Handle quotas gracefully
+### US-63 — Handle quotas gracefully
 
 As a user, I want the extension to continue functioning when one provider hits rate or quota limits, so that my learning session is not interrupted.
 
-### US-63 — All decisions driven by LLM
+### US-64 — All decisions driven by LLM
 
 As a system architect, I want all pedagogical reasoning (item selection, distractor generation, explanation, level estimation) to be handled by the LLM layer through appropriate prompting, so that the extension focuses on presentation and interaction while intelligence resides in the AI backend.
 
