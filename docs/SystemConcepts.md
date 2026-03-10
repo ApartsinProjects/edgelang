@@ -253,7 +253,7 @@ The extension provides an options page where users configure:
 - **Site lists**: blacklist and whitelist modes for site control
 - **Auto-detect page language**: enabled by default, with manual override available via toolbar
 
-### 13. Configurable visual cues
+### 24. Configurable visual cues
 
 The extension provides non-intrusive but clear visual indicators for learnable items. Users can choose from multiple options:
 
@@ -265,7 +265,7 @@ The extension provides non-intrusive but clear visual indicators for learnable i
 
 All cues are designed to be visible enough to notice but not distracting from reading flow. The default is subtle underline with cursor change on hover.
 
-### 14. All intelligence from LLM
+### 25. All intelligence from LLM
 
 Every pedagogical decision is driven by the LLM layer with appropriate prompting:
 
@@ -278,7 +278,7 @@ Every pedagogical decision is driven by the LLM layer with appropriate prompting
 
 The Chrome extension serves primarily as the presentation and interaction layer, while all reasoning, selection, and adaptation logic resides in the LLM backend.
 
-### 15. Browser-local storage
+### 26. Browser-local storage
 
 All user data is stored locally in the browser using chrome.storage. This includes:
 
@@ -292,7 +292,7 @@ No data is sent to external servers. Users can export or clear their data at any
 
 API keys are stored securely in chrome.storage and are never transmitted to any external servers except directly to the AI providers when making LLM requests.
 
-### 16. Offline mode
+### 27. Offline mode
 
 The extension requires an internet connection to function, as all pedagogical intelligence relies on LLM API calls. When offline:
 
@@ -303,7 +303,19 @@ The extension requires an internet connection to function, as all pedagogical in
 
 This ensures users are not confused by non-functional cues and prevents frustration from failed API calls.
 
-### 18. API configuration handling
+### 17. Sensitive content handling
+
+The extension automatically ignores sensitive content areas:
+
+- **Password fields**: never analyzed or highlighted
+- **Credit card numbers**: never analyzed or highlighted
+- **Form inputs**: never analyzed or highlighted
+- **Editable content**: never analyzed or highlighted
+- **Private browsing contexts**: respects browser privacy settings
+
+This ensures user privacy and prevents the extension from interfering with form interactions.
+
+### 28. API configuration handling
 
 When API keys are not configured:
 
@@ -314,7 +326,7 @@ When API keys are not configured:
 
 This prevents user confusion about why the extension isn't working and guides them to configuration.
 
-### 19. Toolbar icon and popup
+### 33. Toolbar icon and popup
 
 The extension appears as an icon in the Chrome toolbar with a popup that provides:
 
@@ -326,7 +338,7 @@ The extension appears as an icon in the Chrome toolbar with a popup that provide
 
 The toolbar icon also shows visual cues when API keys are not configured (e.g., grayed out or warning icon).
 
-### 20. Site blacklist and whitelist
+### 29. Site blacklist and whitelist
 
 Users can control which sites the extension operates on:
 
@@ -337,7 +349,7 @@ Users can control which sites the extension operates on:
 
 This gives users granular control over where learning opportunities appear.
 
-### 21. Auto-detect page language with manual override
+### 30. Auto-detect page language with manual override
 
 The extension automatically detects the language of each page:
 
@@ -347,7 +359,7 @@ The extension automatically detects the language of each page:
 
 This enables seamless switching between passive mode (target language pages) and active mode (native language pages) without user configuration.
 
-### 22. First-run onboarding and calibration wizard
+### 31. First-run onboarding and calibration wizard
 
 On first installation:
 
@@ -358,7 +370,7 @@ On first installation:
 
 Users can re-run calibration anytime from the options page or toolbar popup.
 
-### 23. Non-blocking, fast-loading design
+### 32. Non-blocking, fast-loading design
 
 The extension is designed to never interfere with normal browser usage:
 
@@ -370,6 +382,52 @@ The extension is designed to never interfere with normal browser usage:
 - **Page analysis**: every page visit triggers a fresh analysis to identify learnable items
 
 This ensures the extension enhances browsing rather than hindering it.
+
+### 34. Learning statistics dashboard
+
+The extension provides a learning statistics view accessible from the toolbar popup:
+
+- **Items mastered**: total count of resolved vocabulary items
+- **Current streak**: consecutive days of learning activity
+- **Accuracy rate**: percentage of correct answers over time
+- **Words learned**: breakdown by single words vs phrases
+- **Time spent**: estimated learning time per session/day
+
+This helps learners track their progress and stay motivated.
+
+### 35. Paused/break mode
+
+Users can pause learning temporarily without disabling the extension:
+
+- **One-click pause**: toggle via toolbar popup
+- **Break duration**: set duration (15min, 30min, 1hr, until tomorrow)
+- **Visual indicator**: toolbar shows paused state clearly
+- **Resume**: auto-resumes after duration or manual toggle
+
+This allows users to take breaks without losing configuration or having to re-enable manually.
+
+### 36. Keyboard shortcuts for power users
+
+The extension supports keyboard navigation:
+
+- **Toggle extension**: global hotkey to enable/disable
+- **Next item**: navigate to next visual cue on page
+- **Answer quickly**: number keys 1-6 to select answer
+- **Show/hide popup**: keyboard to trigger popup
+- **Customizable**: users can rebind shortcuts in options
+
+This improves accessibility and power user workflow.
+
+### 37. LLM error handling
+
+When LLM requests fail during a session:
+
+- **Retry with backoff**: automatically retry failed requests up to 3 times
+- **Graceful fallback**: if all retries fail, show page without cues rather than error
+- **Silent failures**: user is not interrupted unless explicitly requested
+- **Logging**: errors are logged locally for debugging
+
+This ensures robust behavior even when AI services are unreliable.
 
 ---
 
@@ -433,31 +491,31 @@ As a learner, I want the system to avoid testing me on items that are too diffic
 
 As a learner, when I visit a page where no items are at my learning edge, I want to see a subtle message or indicator that explains why no visual cues are shown, so that I understand the extension is working but the content is not suitable for my level.
 
-### US-04 — Support phrase-level understanding
+### US-05 — Support phrase-level understanding
 
 As a learner, I want the extension to show visual cues to multi-word expressions and typical word sequences, not just isolated words, so that I can learn natural language patterns.
 
-### US-05 — Learn through contextual multiple choice
+### US-06 — Learn through contextual multiple choice
 
 As a learner, I want to see a small set of translation options when I hover over an item with visual cues, so that I can actively test my understanding without leaving the page.
 
-### US-06 — Learn from plausible mistakes
+### US-07 — Learn from plausible mistakes
 
 As a learner, I want the wrong answer choices to be realistic and close in meaning, so that selecting among them teaches me useful distinctions.
 
-### US-07 — Resolve known items
+### US-08 — Resolve known items
 
 As a learner, I want correctly answered items to be marked as resolved after answering correctly once and hidden forever, so that I can see progress and never be interrupted for already mastered content. I also want the ability to manually reset any resolved item back to active if I want to review it again.
 
-### US-08 — Receive explanation after mistakes
+### US-09 — Receive explanation after mistakes
 
 As a learner, when I choose the wrong translation, I want the system to explain why it is wrong and why the correct answer is better, so that I learn the distinction instead of merely seeing the answer.
 
-### US-09 — See additional examples
+### US-10 — See additional examples
 
 As a learner, I want an option to view more examples of a word or phrase in context, so that I can better understand how it is used naturally.
 
-### US-10 — Preserve flow while reading
+### US-11 — Preserve flow while reading
 
 As a learner, I want the interaction to be lightweight and non-intrusive, so that I can keep reading while still learning.
 
@@ -513,6 +571,10 @@ As a learner, I want the system to gradually stop testing items I have consisten
 
 ## Proficiency Calibration
 
+### US-20 — Self-assess my level before calibration
+
+As a new learner, I want to quickly self-assess my proficiency level before the calibration wizard, so that the system can start with a reasonable estimate and reduce the number of questions needed.
+
 ### US-21 — Assess my level from scratch
 
 As a new learner, I want to answer a structured set of questions upfront so that the system can establish an initial competence estimate without relying on browsing history.
@@ -521,53 +583,53 @@ As a new learner, I want to answer a structured set of questions upfront so that
 
 As a returning learner, I want the option to run a quick calibration that builds on my existing profile rather than starting over, so that I can update my level without redundant questions.
 
-### US-22b — Re-calibrate my level
+### US-23 — Re-calibrate my level
 
 As a learner who wants to reassess my competence, I want to re-run the calibration wizard from scratch to get a fresh level estimate, so that I can reset my profile if I believe it has drifted.
 
-### US-23 — Complete a round of 10 questions
+### US-24 — Complete a round of 10 questions
 
 As a learner, I want each calibration session to consist of exactly 10 questions, so that the assessment is quick and does not feel like a lengthy test.
 
-### US-24 — See provisional results after each round
+### US-25 — See provisional results after each round
 
 As a learner, I want the system to show me a level estimate after every 10 questions, so that I can see how my performance informs the assessment.
 
-### US-25 — Choose to continue or stop
+### US-26 — Choose to continue or stop
 
 As a learner, I want to be asked whether I want to answer another round of 10 questions after seeing my provisional results, so that I control how long the calibration takes.
 
-### US-26 — Experience mixed question types
+### US-27 — Experience mixed question types
 
 As a learner, I want the calibration to include both passive recognition and active recall questions, so that the resulting profile reflects both comprehension and production ability.
 
-### US-27 — Answer questions at varied difficulty bands
+### US-28 — Answer questions at varied difficulty bands
 
 As a learner, I want the calibration to include items spanning easy, moderate, and challenging difficulty, so that the system can precisely locate my competence boundary.
 
-### US-28 — Resume calibration later
+### US-29 — Resume calibration later
 
 As a learner, I want the option to pause and resume a calibration session, so that I can complete it across multiple sittings if needed.
 
 ## Explanation and Pedagogical Support
 
-### US-29 — Explain nuance
+### US-30 — Explain nuance
 
 As a learner, I want explanations to include subtle differences in meaning, register, or usage, so that I develop deeper lexical understanding.
 
-### US-30 — Explain idioms and non-literal meaning
+### US-31 — Explain idioms and non-literal meaning
 
 As a learner, I want the system to explain idiomatic expressions beyond literal translation, so that I can understand authentic language use.
 
-### US-31 — Explain collocations
+### US-32 — Explain collocations
 
 As a learner, I want to be told when a translation is grammatically possible but not the usual word combination, so that I learn natural phrase patterns.
 
-### US-32 — Link feedback to context
+### US-33 — Link feedback to context
 
 As a learner, I want explanations to refer to the sentence context on the page, so that I understand why the correct answer fits this specific usage.
 
-### US-33 — Request deeper help
+### US-34 — Request deeper help
 
 As a learner, I want to optionally expand explanations and examples, so that I can choose between fast interaction and deeper study.
 
@@ -575,15 +637,15 @@ As a learner, I want to optionally expand explanations and examples, so that I c
 
 ## Experience and Product Behavior
 
-### US-34 — Work on arbitrary webpages
+### US-35 — Work on arbitrary webpages
 
 As a learner, I want the extension to work across ordinary websites, so that language learning is embedded into my normal browsing habits.
 
-### US-35 — Keep the interface minimal
+### US-36 — Keep the interface minimal
 
 As a learner, I want visual cues to be clear but unobtrusive, so that the page remains readable.
 
-### US-36 — Control intensity
+### US-37 — Control intensity
 
 As a learner, I want to control how many visual cues are shown on a page, so that the learning density matches my focus and available time.
 
@@ -603,7 +665,11 @@ As a learner, I want the extension to work on single-page applications that dyna
 
 As a learner, I want the extension to optionally process content within iframes (such as embedded articles or comments), so that learning opportunities are not limited to main page content.
 
-### US-41 — Configure visual cue style
+### US-41 — Ignore sensitive content
+
+As a user, I want the extension to automatically ignore password fields, credit card inputs, and other sensitive content, so that my privacy is protected and form interactions are not interrupted.
+
+### US-42 — Configure visual cue style
 
 As a learner, I want to choose how learnable items are visually indicated (underline, background tint, corner dot, or cursor change), so that the visual cue style matches my reading preferences.
 
@@ -679,6 +745,18 @@ As a learner, I want to receive constructive feedback when I answer incorrectly 
 
 As a user, I want to disable positive feedback, negative feedback, or both, so that the learning experience matches my preferences.
 
+### US-59 — View learning statistics
+
+As a learner, I want to see my learning progress including items mastered, current streak, and accuracy rate, so that I can track my growth and stay motivated.
+
+### US-60 — Take a learning break
+
+As a learner, I want to pause learning temporarily without disabling the extension, so that I can take a break while keeping my settings intact.
+
+### US-61 — Use keyboard shortcuts
+
+As a power user, I want keyboard shortcuts to navigate and answer quickly, so that I can use the extension more efficiently.
+
 ---
 
 ## AI and System User Stories
@@ -703,7 +781,11 @@ As a product developer, I want to compare outputs from different providers for t
 
 As a user, I want the extension to continue functioning when one provider hits rate or quota limits, so that my learning session is not interrupted.
 
-### US-64 — All decisions driven by LLM
+### US-65 — Handle LLM errors gracefully
+
+As a user, I want the extension to handle LLM failures gracefully without showing errors, so that my browsing experience is not interrupted.
+
+### US-66 — All decisions driven by LLM
 
 As a system architect, I want all pedagogical reasoning (item selection, distractor generation, explanation, level estimation) to be handled by the LLM layer through appropriate prompting, so that the extension focuses on presentation and interaction while intelligence resides in the AI backend.
 
