@@ -3,10 +3,13 @@
   "version": "0.1.0",
   "description": "AI Chrome Extension for Vocabulary-at-the-Edge Language Learning",
   "type": "module",
-  "dependencies": {
-    "@modelmesh/core": "^0.1.0"
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed"
   },
   "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "playwright": "^1.40.0",
     "typescript": "^5.0.0"
   }
 }
