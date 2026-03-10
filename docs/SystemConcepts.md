@@ -25,7 +25,7 @@ All pedagogical logic is driven by an LLM-based backend. The system continuously
 
 This allows the extension to maintain a dynamic and personalized zone of desirable difficulty while browsing authentic content.
 
-A key architectural choice is the use of **ModelMesh** for routing across multiple AI providers. ModelMesh is an OpenAI-compatible capability-driven routing library available in both Python and TypeScript. The TypeScript implementation runs directly in the Chrome extension's JavaScript environment, providing automatic failover, free-tier aggregation, and capability-based routing without requiring a separate backend server. As a result, EdgeLang can improve resilience, manage cost and quota constraints, reduce dependence on a single provider, and support future experimentation with model-specific prompting strategies for different pedagogical tasks such as phrase selection, distractor generation, explanation generation, and learner-level estimation.
+A key architectural choice is the use of **ModelMesh** for routing across multiple AI providers. ModelMesh is an OpenAI-compatible capability-driven routing library available in both Python and TypeScript. The TypeScript implementation runs directly in the Chrome extension's JavaScript environment, providing automatic failover, free-tier aggregation, and capability-based routing without requiring a separate backend server. Because Chrome extensions are permitted to make cross-origin API requests, ModelMesh can call AI providers directly without a CORS proxy. As a result, EdgeLang can improve resilience, manage cost and quota constraints, reduce dependence on a single provider, and support future experimentation with model-specific prompting strategies for different pedagogical tasks such as phrase selection, distractor generation, explanation generation, and learner-level estimation.
 
 ---
 
@@ -217,7 +217,7 @@ The learner can request extra examples and short usage notes to support durable 
 
 ### 10. Multi-provider AI execution
 
-The extension uses ModelMesh TypeScript library to route pedagogical requests across multiple AI providers directly from the browser, with automatic failover and quota management.
+The extension uses ModelMesh TypeScript library to route pedagogical requests across multiple AI providers directly from the browser, with automatic failover and quota management. Because Chrome extensions can make cross-origin API calls, ModelMesh connects to AI providers directly without requiring a CORS proxy.
 
 When all configured providers have exhausted their quotas:
 
