@@ -118,13 +118,14 @@ Responsible for:
 Implemented using **ModelMesh TypeScript library** (running directly in the Chrome extension), responsible for:
 
 - rotating across multiple AI providers (OpenAI, Anthropic, Gemini, Groq, etc.) from the browser,
+- routing TTS requests to speech synthesis providers (Azure Speech, Google Translate TTS, etc.),
 - providing OpenAI-compatible interface,
 - handling automatic failover with retry and backoff,
 - managing quotas and rate limits across providers,
 - enabling capability-based routing strategies,
 - supporting A/B testing across providers and models.
 
-This architecture allows EdgeLang to treat AI backends as interchangeable reasoning engines behind a stable product experience.
+This architecture allows EdgeLang to treat all AI backends (LLM and TTS) as interchangeable services behind a stable product experience.
 
 ---
 
@@ -219,7 +220,7 @@ The learner can request extra examples and short usage notes to support durable 
 
 The extension provides audio pronunciation for target language words:
 
-- **Text-to-speech API**: Uses free-tier TTS services (Google Translate, Microsoft Azure Speech, or similar) to generate pronunciation
+- **TTS via ModelMesh**: All text-to-speech requests are routed through ModelMesh, which can route to various TTS providers (Microsoft Azure Speech, Google Translate TTS, or similar) with automatic failover
 - **On-demand playback**: Click to hear pronunciation of correct answer or selected word
 - **Configurable**: Users can enable/disable pronunciation audio
 - **Caching**: Pronunciations are cached locally to reduce API calls
@@ -301,7 +302,7 @@ All user data is stored locally in the browser using chrome.storage. This includ
 
 No data is sent to external servers. Users can export or clear their data at any time through the options page.
 
-API keys are stored securely in chrome.storage and are never transmitted to any external servers except directly to the AI providers when making LLM requests.
+API keys are stored securely in chrome.storage and are never transmitted to any external servers except directly to the AI providers (LLM and TTS) via ModelMesh when making requests.
 
 ### 18. Offline mode
 
@@ -702,7 +703,7 @@ As a new user, I want to specify my native language and the foreign language I w
 
 ### US-47 — Configure API keys
 
-As a user, I want to enter API keys for one or more AI providers (OpenAI, Anthropic, Gemini, Groq), so that the extension can make LLM requests.
+As a user, I want to enter API keys for one or more AI providers (LLM and TTS via ModelMesh), so that the extension can make requests.
 
 ### US-48 — Select models for different tasks
 
