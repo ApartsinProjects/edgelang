@@ -6,8 +6,8 @@
 
 The extension operates in two complementary modes:
 
-- **Passive mode**: the page is shown in the foreign language, and the extension adds visual cues to words and multi-word expressions that the learner is likely close to understanding but has not yet fully mastered. When the learner hovers over a highlighted item, a popup appears with multiple choice translation options. Selecting an answer provides instant feedback.
-- **Active mode**: the page is shown in the learner’s native language, and the extension adds visual cues to native-language words or phrases that correspond to useful foreign-language expressions the learner is learning. When the learner hovers over a highlighted item, a popup appears with multiple choice options for the foreign-language translation. This trains active recall and production ability—the skill of translating from native to target language.
+- **Passive mode**: the page is shown in the foreign language, and the extension adds visual cues to words and multi-word expressions that the learner is likely close to understanding but has not yet fully mastered. When the learner hovers over an item with visual cues, a popup appears with multiple choice translation options. Selecting an answer provides instant feedback.
+- **Active mode**: the page is shown in the learner’s native language, and the extension adds visual cues to native-language words or phrases that correspond to useful foreign-language expressions the learner is learning. When the learner hovers over an item with visual cues, a popup appears with multiple choice options for the foreign-language translation. This trains active recall and production ability—the skill of translating from native to target language.
 
 For each selected item, the extension presents a small set of carefully chosen translation options designed not only to test correctness, but also to promote learning through **contrast**. Distractors are intentionally close enough to the correct meaning to be educational rather than arbitrary. When the learner answers incorrectly, the system explains:
 
@@ -85,8 +85,8 @@ EdgeLang consists of the following main layers:
 Responsible for:
 
 - page text extraction using Chrome content scripts,
-- segmentation into candidate words and multi-word expressions,
-- visual highlighting and cue rendering,
+- extracting and sending raw text to LLM for analysis,
+- rendering visual cues based on LLM response,
 - hover and interaction popups,
 - response collection,
 - local state and user preference handling via chrome.storage,
@@ -175,15 +175,15 @@ The extension handles:
 
 ### 3. Passive recognition mode
 
-The learner reads foreign-language content and is gently prompted on selected foreign items.
+The learner reads foreign-language content and sees visual cues on words and phrases near their ability level. When hovering over a cued item, a popup appears with multiple choice translation options for instant practice.
 
 ### 4. Active recall mode
 
-The learner reads native-language content and is asked to retrieve the foreign-language equivalent of selected expressions.
+The learner reads native-language content and sees visual cues on words that correspond to useful foreign-language expressions. When hovering over a cued item, a popup appears with multiple choice options to practice translating from native to target language.
 
 ### 5. Pedagogically meaningful distractors
 
-Wrong answer options are selected to be plausible and instructionally useful, helping the learner notice semantic boundaries and usage distinctions.
+Wrong answer options are selected to be plausible and instructionally useful, helping the learner notice semantic boundaries and usage distinctions. Each question presents **5 translation options by default** (1 correct + 4 distractors), configurable in options (3-6 options).
 
 ### 6. Explanation-rich feedback
 
@@ -196,11 +196,22 @@ Incorrect answers trigger explanations of:
 - near-synonym confusion,
 - or literal-vs-natural translation differences.
 
-### 7. Personalized adaptation
+### 7. Gamified feedback
+
+The extension includes optional gamification elements to enhance motivation:
+
+- **Positive feedback** (can be disabled): When answering correctly, the learner sees encouraging micro-animations (subtle pulse, checkmark), streak counters, and motivational messages ("Great job!", "You're improving!")
+- **Constructive feedback** (can be disabled): When answering incorrectly, instead of just showing the error, the system provides encouraging messages ("Almost!", "Good try!", "This is tricky") alongside the explanation
+- **Progress indicators**: Visual progress bars showing items mastered, streak count, and level progression
+- **Streaks**: Consecutive correct answers tracked and celebrated
+
+All gamification features are independently toggleable in options.
+
+### 8. Personalized adaptation
 
 The system remembers prior success, repeated errors, and resolved items to avoid wasting attention on content that is clearly too easy or too hard. **Hesitation detection**: the LLM analyzes response time patterns from interaction history to identify items where the learner hesitated before answering, indicating partial knowledge that needs reinforcement.
 
-### 8. Example-driven reinforcement
+### 9. Example-driven reinforcement
 
 The learner can request extra examples and short usage notes to support durable understanding.
 
@@ -224,9 +235,13 @@ The extension provides an options page where users configure:
 - **Target language**: the foreign language to learn
 - **AI providers**: API keys for OpenAI, Anthropic, Gemini, Groq, or other ModelMesh-supported providers
 - **Model selection**: which models to use for different tasks (e.g., faster models for classification, smarter models for explanation generation)
-- **Visual cues**: preferred highlighting style (see capability #13)
-- **Intensity slider**: how many items to highlight per page
+- **Visual cues**: preferred visual cue style (see capability #13)
+- **Intensity slider**: how many items receive visual cues per page
+- **Multiple choice options**: number of choices per question (default 5, range 3-6)
+- **Gamification toggles**: enable/disable positive feedback, negative feedback separately
 - **Auto-start preferences**: whether to launch calibration on first use
+- **Site lists**: blacklist and whitelist modes for site control
+- **Auto-detect page language**: enabled by default, with manual override available via toolbar
 
 ### 13. Configurable visual cues
 
@@ -269,12 +284,23 @@ No data is sent to external servers. Users can export or clear their data at any
 
 The extension requires an internet connection to function, as all pedagogical intelligence relies on LLM API calls. When offline:
 
-- The extension automatically disables all highlighting and interaction
+- The extension automatically disables all visual cues and interaction
 - A status indicator shows that the extension is offline
 - Previously cached data (profile, settings, resolved items) remains stored locally
 - When connectivity returns, the extension resumes normal operation automatically
 
 This ensures users are not confused by non-functional cues and prevents frustration from failed API calls.
+
+### 16. API configuration handling
+
+When API keys are not configured:
+
+- Toolbar icon shows a warning indicator (grayed out or exclamation icon)
+- Popup displays clear message prompting user to configure API keys
+- Options page opens automatically when clicking the warning icon
+- No visual cues appear on pages until API keys are configured
+
+This prevents user confusion about why the extension isn't working and guides them to configuration.
 
 ### 17. Toolbar icon and popup
 
@@ -299,14 +325,24 @@ Users can control which sites the extension operates on:
 
 This gives users granular control over where learning opportunities appear.
 
-### 19. First-run onboarding and calibration wizard
+### 19. Auto-detect page language with manual override
+
+The extension automatically detects the language of each page:
+
+- **Auto-detect** (default): uses browser APIs and LLM to detect if page is in native or target language
+- **Manual toggle**: via toolbar popup, user can override auto-detection for current page
+- **Persistence**: manual override applies to current session or can be saved per-site
+
+This enables seamless switching between passive mode (target language pages) and active mode (native language pages) without user configuration.
+
+### 21. First-run onboarding and calibration wizard
 
 On first installation:
 
 1. Options page opens automatically to configure native language, target language, and API keys
 2. After configuration, the proficiency calibration wizard launches automatically to establish initial competence estimate
 3. The wizard presents 10 questions at a time, allowing users to continue or stop after each round
-4. Once calibrated, the extension begins highlighting learnable items on web pages
+4. Once calibrated, the extension begins showing visual cues on learnable items on web pages
 
 Users can re-run calibration anytime from the options page or toolbar popup.
 
@@ -370,11 +406,11 @@ It is especially suitable for users who want to improve:
 
 ### US-01 — Detect relevant learning opportunities
 
-As a learner reading a foreign-language webpage, I want the extension to highlight only words and expressions that are near my current level, so that I am challenged without being overwhelmed.
+As a learner reading a foreign-language webpage, I want the extension to show visual cues to only words and expressions that are near my current level, so that I am challenged without being overwhelmed.
 
 ### US-02 — Avoid trivial interruptions
 
-As a learner, I want the system to avoid highlighting items I clearly already know, so that the experience remains efficient and not distracting.
+As a learner, I want the system to avoid showing visual cues to items I clearly already know, so that the experience remains efficient and not distracting.
 
 ### US-03 — Avoid impossible items
 
@@ -382,11 +418,11 @@ As a learner, I want the system to avoid testing me on items that are too diffic
 
 ### US-04 — Support phrase-level understanding
 
-As a learner, I want the extension to highlight multi-word expressions and typical word sequences, not just isolated words, so that I can learn natural language patterns.
+As a learner, I want the extension to show visual cues to multi-word expressions and typical word sequences, not just isolated words, so that I can learn natural language patterns.
 
 ### US-05 — Learn through contextual multiple choice
 
-As a learner, I want to see a small set of translation options when I hover over a highlighted item, so that I can actively test my understanding without leaving the page.
+As a learner, I want to see a small set of translation options when I hover over an item with visual cues, so that I can actively test my understanding without leaving the page.
 
 ### US-06 — Learn from plausible mistakes
 
@@ -528,7 +564,7 @@ As a learner, I want visual cues to be clear but unobtrusive, so that the page r
 
 ### US-36 — Control intensity
 
-As a learner, I want to control how many items are highlighted on a page, so that the learning density matches my focus and available time.
+As a learner, I want to control how many visual cues are shown on a page, so that the learning density matches my focus and available time.
 
 ### US-37 — Switch between passive and active modes
 
@@ -536,7 +572,7 @@ As a learner, I want to switch between recognition-oriented and production-orien
 
 ### US-38 — Feel progress over time
 
-As a learner, I want to see that fewer easy items are highlighted and more relevant edge items are selected over time, so that the system feels personalized and effective.
+As a learner, I want to see that fewer easy visual cues are shown and more relevant edge items are selected over time, so that the system feels personalized and effective.
 
 ### US-39 — Handle dynamic page content
 
@@ -548,7 +584,7 @@ As a learner, I want the extension to optionally process content within iframes 
 
 ### US-41 — Configure visual cue style
 
-As a learner, I want to choose how learnable items are visually indicated (underline, background tint, corner dot, or cursor change), so that the highlighting matches my reading preferences.
+As a learner, I want to choose how learnable items are visually indicated (underline, background tint, corner dot, or cursor change), so that the visual cue style matches my reading preferences.
 
 ### US-42 — Adjust cue visibility
 
@@ -556,7 +592,7 @@ As a learner, I want to control how prominent the visual cues are, so that I can
 
 ### US-43 — Work offline gracefully
 
-As a learner, I want the extension to detect when I am offline and show a clear status, so that I understand why highlighting is disabled and know when to resume learning.
+As a learner, I want the extension to detect when I am offline and show a clear status, so that I understand why visual cues are hidden and know when to resume learning.
 
 ---
 
@@ -574,9 +610,9 @@ As a user, I want to enter API keys for one or more AI providers (OpenAI, Anthro
 
 As a user, I want to choose which models to use for different operations (fast models for classification, smart models for explanations), so that I can balance speed, cost, and quality.
 
-### US-47 — Control highlighting intensity
+### US-47 — Control visual cue intensity
 
-As a learner, I want to adjust how many items are highlighted on each page via a slider, so that the learning density matches my available time and focus.
+As a learner, I want to adjust how many visual cues are shown on each page via a slider, so that the learning density matches my available time and focus.
 
 ### US-48 — Export or clear my data
 
@@ -605,6 +641,18 @@ As a user, I want to add or remove the current site from my blacklist or whiteli
 ### US-54 — Run calibration wizard on first use
 
 As a new user, I want the calibration wizard to launch automatically after configuration, so that the extension starts with a personalized level estimate.
+
+### US-55 — Get positive feedback on correct answers
+
+As a learner, I want to receive encouraging feedback (points, streaks, encouraging messages) when I answer correctly, so that I feel motivated and see my progress.
+
+### US-56 — Get constructive feedback on incorrect answers
+
+As a learner, I want to receive constructive feedback when I answer incorrectly (e.g., encouraging messages, explanation), so that I stay motivated to keep trying.
+
+### US-57 — Disable gamification features
+
+As a user, I want to disable positive feedback, negative feedback, or both, so that the learning experience matches my preferences.
 
 ---
 
